@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "name": "Price Alert Notification",
+  "description": "Monitor NIFTY and send Telegram alert when price crosses 24000",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Every 1 Minute",
+        "scheduleType": "interval",
+        "intervalValue": 1,
+        "intervalUnit": "minutes",
+        "time": "09:15"
+      }
+    },
+    {
+      "id": "quote-1",
+      "type": "getQuote",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Get NIFTY Quote",
+        "symbol": "NIFTY 50",
+        "exchange": "NSE_INDEX",
+        "outputVariable": "niftyQuote"
+      }
+    },
+    {
+      "id": "var-1",
+      "type": "variable",
+      "position": { "x": 250, "y": 310 },
+      "data": {
+        "label": "Store LTP",
+        "variableName": "niftyLtp",
+        "operation": "set",
+        "value": "{{niftyQuote.data.ltp}}"
+      }
+    },
+    {
+      "id": "condition-1",
+      "type": "priceCondition",
+      "position": { "x": 250, "y": 440 },
+      "data": {
+        "label": "Check > 24000",
+        "symbol": "NIFTY 50",
+        "exchange": "NSE_INDEX",
+        "operator": ">",
+        "price": 24000
+      }
+    },
+    {
+      "id": "telegram-1",
+      "type": "telegramAlert",
+      "position": { "x": 100, "y": 570 },
+      "data": {
+        "label": "Alert: Above 24000",
+        "message": "NIFTY crossed 24000!\n\nCurrent LTP: {{niftyLtp}}\nTime: {{time}}\n\nConsider taking positions."
+      }
+    },
+    {
+      "id": "log-1",
+      "type": "log",
+      "position": { "x": 400, "y": 570 },
+      "data": {
+        "label": "Log Below",
+        "level": "info",
+        "message": "NIFTY at {{niftyLtp}} - below 24000"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "quote-1" },
+    { "id": "e2", "source": "quote-1", "target": "var-1" },
+    { "id": "e3", "source": "var-1", "target": "condition-1" },
+    { "id": "e4", "source": "condition-1", "target": "telegram-1", "sourceHandle": "yes" },
+    { "id": "e5", "source": "condition-1", "target": "log-1", "sourceHandle": "no" }
+  ]
+}

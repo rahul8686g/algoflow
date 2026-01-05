@@ -1,0 +1,99 @@
+{
+  "version": "1.0",
+  "name": "Intraday Time-Based Strategy",
+  "description": "Buy at 9:30 AM, automatically square off at 3:15 PM",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Daily 9:30 AM",
+        "scheduleType": "daily",
+        "time": "09:30",
+        "days": [1, 2, 3, 4, 5]
+      }
+    },
+    {
+      "id": "fund-check",
+      "type": "fundCheck",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Check Funds > 50000",
+        "operator": "gt",
+        "threshold": 50000
+      }
+    },
+    {
+      "id": "order-1",
+      "type": "placeOrder",
+      "position": { "x": 100, "y": 310 },
+      "data": {
+        "label": "Buy SBIN",
+        "symbol": "SBIN",
+        "exchange": "NSE",
+        "action": "BUY",
+        "quantity": 100,
+        "priceType": "MARKET",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "telegram-entry",
+      "type": "telegramAlert",
+      "position": { "x": 100, "y": 440 },
+      "data": {
+        "label": "Entry Alert",
+        "message": "ENTRY: BUY 100 SBIN @ MARKET\nProduct: MIS (Intraday)\nTime: {{time}}"
+      }
+    },
+    {
+      "id": "wait-exit",
+      "type": "waitUntil",
+      "position": { "x": 100, "y": 570 },
+      "data": {
+        "label": "Wait Until 3:15 PM",
+        "targetTime": "15:15"
+      }
+    },
+    {
+      "id": "close-1",
+      "type": "closePositions",
+      "position": { "x": 100, "y": 700 },
+      "data": {
+        "label": "Square Off",
+        "symbol": "SBIN",
+        "exchange": "NSE",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "telegram-exit",
+      "type": "telegramAlert",
+      "position": { "x": 100, "y": 830 },
+      "data": {
+        "label": "Exit Alert",
+        "message": "EXIT: Squared off SBIN position\nTime: {{time}}\n\nEnd of day closure."
+      }
+    },
+    {
+      "id": "log-insufficient",
+      "type": "log",
+      "position": { "x": 400, "y": 310 },
+      "data": {
+        "label": "Insufficient Funds",
+        "level": "warn",
+        "message": "Insufficient funds for SBIN trade. Required: 50000+"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "fund-check" },
+    { "id": "e2", "source": "fund-check", "target": "order-1", "sourceHandle": "yes" },
+    { "id": "e3", "source": "fund-check", "target": "log-insufficient", "sourceHandle": "no" },
+    { "id": "e4", "source": "order-1", "target": "telegram-entry" },
+    { "id": "e5", "source": "telegram-entry", "target": "wait-exit" },
+    { "id": "e6", "source": "wait-exit", "target": "close-1" },
+    { "id": "e7", "source": "close-1", "target": "telegram-exit" }
+  ]
+}

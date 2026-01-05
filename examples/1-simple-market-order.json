@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "name": "Simple Market Order",
+  "description": "Basic workflow: Buy 1 lot of RELIANCE at market price every day at 9:20 AM",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Daily 9:20 AM",
+        "scheduleType": "daily",
+        "time": "09:20",
+        "days": [1, 2, 3, 4, 5]
+      }
+    },
+    {
+      "id": "order-1",
+      "type": "placeOrder",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Buy RELIANCE",
+        "symbol": "RELIANCE",
+        "exchange": "NSE",
+        "action": "BUY",
+        "quantity": 1,
+        "priceType": "MARKET",
+        "product": "CNC"
+      }
+    },
+    {
+      "id": "telegram-1",
+      "type": "telegramAlert",
+      "position": { "x": 250, "y": 310 },
+      "data": {
+        "label": "Notify",
+        "message": "Order placed: BUY 1 RELIANCE at MARKET\nTime: {{time}}"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "order-1" },
+    { "id": "e2", "source": "order-1", "target": "telegram-1" }
+  ]
+}

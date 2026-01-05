@@ -1,0 +1,127 @@
+{
+  "version": "1.0",
+  "name": "Profit Target Exit",
+  "description": "Check position P&L every 5 mins, exit if profit > 5000 or loss > 2000",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 300, "y": 50 },
+      "data": {
+        "label": "Every 5 Minutes",
+        "scheduleType": "interval",
+        "intervalValue": 5,
+        "intervalUnit": "minutes",
+        "time": "09:15"
+      }
+    },
+    {
+      "id": "position-1",
+      "type": "openPosition",
+      "position": { "x": 300, "y": 180 },
+      "data": {
+        "label": "Get RELIANCE Position",
+        "symbol": "RELIANCE",
+        "exchange": "NSE",
+        "product": "MIS",
+        "outputVariable": "position"
+      }
+    },
+    {
+      "id": "var-pnl",
+      "type": "variable",
+      "position": { "x": 300, "y": 310 },
+      "data": {
+        "label": "Extract P&L",
+        "variableName": "pnl",
+        "operation": "set",
+        "value": "{{position.pnl}}"
+      }
+    },
+    {
+      "id": "check-profit",
+      "type": "fundCheck",
+      "position": { "x": 150, "y": 440 },
+      "data": {
+        "label": "Profit > 5000?",
+        "operator": "gt",
+        "threshold": 5000,
+        "checkType": "custom",
+        "customValue": "{{pnl}}"
+      }
+    },
+    {
+      "id": "check-loss",
+      "type": "fundCheck",
+      "position": { "x": 450, "y": 440 },
+      "data": {
+        "label": "Loss > 2000?",
+        "operator": "lt",
+        "threshold": -2000,
+        "checkType": "custom",
+        "customValue": "{{pnl}}"
+      }
+    },
+    {
+      "id": "exit-profit",
+      "type": "closePositions",
+      "position": { "x": 50, "y": 570 },
+      "data": {
+        "label": "Exit - Target Hit",
+        "symbol": "RELIANCE",
+        "exchange": "NSE",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "exit-loss",
+      "type": "closePositions",
+      "position": { "x": 550, "y": 570 },
+      "data": {
+        "label": "Exit - Stop Loss",
+        "symbol": "RELIANCE",
+        "exchange": "NSE",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "telegram-profit",
+      "type": "telegramAlert",
+      "position": { "x": 50, "y": 700 },
+      "data": {
+        "label": "Profit Alert",
+        "message": "TARGET HIT!\n\nRELIANCE position closed\nP&L: {{pnl}}\nTime: {{time}}"
+      }
+    },
+    {
+      "id": "telegram-loss",
+      "type": "telegramAlert",
+      "position": { "x": 550, "y": 700 },
+      "data": {
+        "label": "Loss Alert",
+        "message": "STOP LOSS HIT!\n\nRELIANCE position closed\nP&L: {{pnl}}\nTime: {{time}}"
+      }
+    },
+    {
+      "id": "log-hold",
+      "type": "log",
+      "position": { "x": 300, "y": 570 },
+      "data": {
+        "label": "Hold Position",
+        "level": "info",
+        "message": "RELIANCE P&L: {{pnl}} - within limits, holding"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "position-1" },
+    { "id": "e2", "source": "position-1", "target": "var-pnl" },
+    { "id": "e3", "source": "var-pnl", "target": "check-profit" },
+    { "id": "e4", "source": "var-pnl", "target": "check-loss" },
+    { "id": "e5", "source": "check-profit", "target": "exit-profit", "sourceHandle": "yes" },
+    { "id": "e6", "source": "check-profit", "target": "log-hold", "sourceHandle": "no" },
+    { "id": "e7", "source": "check-loss", "target": "exit-loss", "sourceHandle": "yes" },
+    { "id": "e8", "source": "exit-profit", "target": "telegram-profit" },
+    { "id": "e9", "source": "exit-loss", "target": "telegram-loss" }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "version": "1.0",
+  "name": "NIFTY ATM Straddle Entry",
+  "description": "Sell ATM Straddle at 9:20 AM with position monitoring",
+  "nodes": [
+    {
+      "id": "start-1",
+      "type": "start",
+      "position": { "x": 300, "y": 50 },
+      "data": {
+        "label": "Daily 9:20 AM",
+        "scheduleType": "daily",
+        "time": "09:20",
+        "days": [1, 2, 3, 4, 5]
+      }
+    },
+    {
+      "id": "ce-symbol",
+      "type": "optionSymbol",
+      "position": { "x": 150, "y": 180 },
+      "data": {
+        "label": "Get ATM CE",
+        "underlying": "NIFTY",
+        "exchange": "NSE_INDEX",
+        "expiryType": "current_week",
+        "offset": "ATM",
+        "optionType": "CE",
+        "outputVariable": "ceSymbol"
+      }
+    },
+    {
+      "id": "pe-symbol",
+      "type": "optionSymbol",
+      "position": { "x": 450, "y": 180 },
+      "data": {
+        "label": "Get ATM PE",
+        "underlying": "NIFTY",
+        "exchange": "NSE_INDEX",
+        "expiryType": "current_week",
+        "offset": "ATM",
+        "optionType": "PE",
+        "outputVariable": "peSymbol"
+      }
+    },
+    {
+      "id": "sell-ce",
+      "type": "placeOrder",
+      "position": { "x": 150, "y": 330 },
+      "data": {
+        "label": "Sell CE",
+        "symbol": "{{ceSymbol.symbol}}",
+        "exchange": "NFO",
+        "action": "SELL",
+        "quantity": 75,
+        "priceType": "MARKET",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "sell-pe",
+      "type": "placeOrder",
+      "position": { "x": 450, "y": 330 },
+      "data": {
+        "label": "Sell PE",
+        "symbol": "{{peSymbol.symbol}}",
+        "exchange": "NFO",
+        "action": "SELL",
+        "quantity": 75,
+        "priceType": "MARKET",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "quote-ce",
+      "type": "getQuote",
+      "position": { "x": 150, "y": 460 },
+      "data": {
+        "label": "Get CE Premium",
+        "symbol": "{{ceSymbol.symbol}}",
+        "exchange": "NFO",
+        "outputVariable": "ceQuote"
+      }
+    },
+    {
+      "id": "quote-pe",
+      "type": "getQuote",
+      "position": { "x": 450, "y": 460 },
+      "data": {
+        "label": "Get PE Premium",
+        "symbol": "{{peSymbol.symbol}}",
+        "exchange": "NFO",
+        "outputVariable": "peQuote"
+      }
+    },
+    {
+      "id": "var-ce",
+      "type": "variable",
+      "position": { "x": 150, "y": 590 },
+      "data": {
+        "variableName": "cePremium",
+        "operation": "set",
+        "value": "{{ceQuote.data.ltp}}"
+      }
+    },
+    {
+      "id": "var-pe",
+      "type": "variable",
+      "position": { "x": 450, "y": 590 },
+      "data": {
+        "variableName": "pePremium",
+        "operation": "set",
+        "value": "{{peQuote.data.ltp}}"
+      }
+    },
+    {
+      "id": "math-total",
+      "type": "mathExpression",
+      "position": { "x": 300, "y": 720 },
+      "data": {
+        "label": "Total Premium",
+        "expression": "{{cePremium}} + {{pePremium}}",
+        "outputVariable": "totalPremium"
+      }
+    },
+    {
+      "id": "math-collected",
+      "type": "mathExpression",
+      "position": { "x": 300, "y": 850 },
+      "data": {
+        "label": "Premium Collected",
+        "expression": "{{totalPremium}} * 75",
+        "outputVariable": "premiumCollected"
+      }
+    },
+    {
+      "id": "telegram-1",
+      "type": "telegramAlert",
+      "position": { "x": 300, "y": 980 },
+      "data": {
+        "label": "Entry Confirmation",
+        "message": "NIFTY ATM STRADDLE SOLD\n\nCE: {{ceSymbol.symbol}} @ {{cePremium}}\nPE: {{peSymbol.symbol}} @ {{pePremium}}\n\nTotal Premium: {{totalPremium}}\nPremium Collected: Rs {{premiumCollected}}\nLot Size: 75\n\nTime: {{time}}"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "start-1", "target": "ce-symbol" },
+    { "id": "e2", "source": "start-1", "target": "pe-symbol" },
+    { "id": "e3", "source": "ce-symbol", "target": "sell-ce" },
+    { "id": "e4", "source": "pe-symbol", "target": "sell-pe" },
+    { "id": "e5", "source": "sell-ce", "target": "quote-ce" },
+    { "id": "e6", "source": "sell-pe", "target": "quote-pe" },
+    { "id": "e7", "source": "quote-ce", "target": "var-ce" },
+    { "id": "e8", "source": "quote-pe", "target": "var-pe" },
+    { "id": "e9", "source": "var-ce", "target": "math-total" },
+    { "id": "e10", "source": "var-pe", "target": "math-total" },
+    { "id": "e11", "source": "math-total", "target": "math-collected" },
+    { "id": "e12", "source": "math-collected", "target": "telegram-1" }
+  ]
+}

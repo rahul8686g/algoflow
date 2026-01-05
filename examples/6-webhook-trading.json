@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "name": "Webhook Signal Trading",
+  "description": "Execute trades from TradingView or external signals via webhook",
+  "nodes": [
+    {
+      "id": "webhook-1",
+      "type": "webhookTrigger",
+      "position": { "x": 250, "y": 50 },
+      "data": {
+        "label": "Receive Signal"
+      }
+    },
+    {
+      "id": "log-signal",
+      "type": "log",
+      "position": { "x": 250, "y": 180 },
+      "data": {
+        "label": "Log Signal",
+        "level": "info",
+        "message": "Webhook received: {{webhook.action}} {{webhook.symbol}}"
+      }
+    },
+    {
+      "id": "time-check",
+      "type": "timeWindow",
+      "position": { "x": 250, "y": 310 },
+      "data": {
+        "label": "Market Hours?",
+        "startTime": "09:15",
+        "endTime": "15:30"
+      }
+    },
+    {
+      "id": "order-1",
+      "type": "placeOrder",
+      "position": { "x": 100, "y": 440 },
+      "data": {
+        "label": "Execute Signal",
+        "symbol": "{{webhook.symbol}}",
+        "exchange": "{{webhook.exchange}}",
+        "action": "{{webhook.action}}",
+        "quantity": "{{webhook.quantity}}",
+        "priceType": "MARKET",
+        "product": "MIS"
+      }
+    },
+    {
+      "id": "telegram-success",
+      "type": "telegramAlert",
+      "position": { "x": 100, "y": 570 },
+      "data": {
+        "label": "Trade Executed",
+        "message": "SIGNAL EXECUTED\n\nAction: {{webhook.action}}\nSymbol: {{webhook.symbol}}\nQty: {{webhook.quantity}}\n\nTime: {{time}}"
+      }
+    },
+    {
+      "id": "telegram-rejected",
+      "type": "telegramAlert",
+      "position": { "x": 400, "y": 440 },
+      "data": {
+        "label": "Signal Rejected",
+        "message": "SIGNAL REJECTED\n\nReason: Outside market hours\nAction: {{webhook.action}}\nSymbol: {{webhook.symbol}}\n\nTime: {{time}}"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "webhook-1", "target": "log-signal" },
+    { "id": "e2", "source": "log-signal", "target": "time-check" },
+    { "id": "e3", "source": "time-check", "target": "order-1", "sourceHandle": "yes" },
+    { "id": "e4", "source": "time-check", "target": "telegram-rejected", "sourceHandle": "no" },
+    { "id": "e5", "source": "order-1", "target": "telegram-success" }
+  ],
+  "webhookPayloadExample": {
+    "action": "BUY",
+    "symbol": "RELIANCE",
+    "exchange": "NSE",
+    "quantity": 10
+  }
+}
