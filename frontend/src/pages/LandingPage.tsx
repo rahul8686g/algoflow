@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeCustomizer } from '@/components/ThemeCustomizer'
-import { ArrowRight, Zap, Code2, LineChart, Cpu, Lock } from 'lucide-react'
+import { ArrowRight, Zap, Code2, LineChart, Cpu, Lock, Check } from 'lucide-react'
 
 export function LandingPage() {
     const navigate = useNavigate()
@@ -25,7 +26,7 @@ export function LandingPage() {
                     <div className="h-8 w-8 rounded bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-[0_0_15px_rgba(var(--primary),0.5)]">
                         <div className="h-4 w-4 bg-black rounded-sm transform rotate-45"></div>
                     </div>
-                    <span className="text-xl font-bold tracking-tighter">ALGO<span className="text-primary">FLOW</span></span>
+                    <span className="text-xl font-bold tracking-tighter">ALGO <span className="text-primary">FLOW</span></span>
                 </div>
                 <div className="flex items-center gap-4">
                     <ThemeCustomizer />
@@ -134,6 +135,33 @@ export function LandingPage() {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section className="relative z-10 container mx-auto px-4 mb-24">
+                <h2 className="mb-16 text-center text-3xl font-bold md:text-5xl">
+                    Simple, Transparent <span className="text-primary">Pricing</span>
+                </h2>
+                <div className="grid gap-8 md:grid-cols-3">
+                    <PricingCard
+                        title="Starter"
+                        price="Free"
+                        features={['Basic Strategy Builder', 'Local Execution', '1 Workspace', 'Community Support']}
+                    />
+                    <PricingCard
+                        title="Pro"
+                        price="$29"
+                        period="/mo"
+                        isPopular
+                        features={['Advanced Nodes', 'Cloud Execution', 'Unlimited Workspaces', 'Priority Support', 'Live Data Feed']}
+                    />
+                    <PricingCard
+                        title="Institutional"
+                        price="$99"
+                        period="/mo"
+                        features={['Custom API Integration', 'Dedicated Server', 'White Label', '24/7 Phone Support', 'SLA Guarantee']}
+                    />
+                </div>
+            </section>
+
             <section className="relative z-10 mb-20 container mx-auto px-4">
                 <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-900/20 to-primary/20 p-12 text-center md:p-24">
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
@@ -183,13 +211,50 @@ function FeatureCard({ icon: Icon, title, desc, delay }: { icon: any, title: str
     )
 }
 
+
 function MetricItem({ value, label }: { value: string, label: string }) {
+    const numericPart = parseFloat(value.replace(/[^0-9.]/g, ''))
+    const suffix = value.replace(/[0-9.]/g, '')
+    const animatedValue = useCountUp(numericPart, 2000)
+
     return (
         <div>
-            <div className="text-3xl font-bold text-white md:text-4xl">{value}</div>
+            <div className="text-3xl font-bold text-white md:text-4xl">
+                {animatedValue}{suffix}
+            </div>
             <div className="mt-1 text-sm text-gray-400 uppercase tracking-wider">{label}</div>
         </div>
     )
+}
+
+function useCountUp(end: number, duration: number = 2000) {
+    const [count, setCount] = useState(0)
+
+    useEffect(() => {
+        let startTime: number | null = null
+        let animationFrame: number
+
+        const animate = (currentTime: number) => {
+            if (!startTime) startTime = currentTime
+            const progress = currentTime - startTime
+            const percentage = Math.min(progress / duration, 1)
+
+            // Ease out quart
+            const ease = 1 - Math.pow(1 - percentage, 4)
+
+            setCount(parseFloat((end * ease).toFixed(1)))
+
+            if (progress < duration) {
+                animationFrame = requestAnimationFrame(animate)
+            }
+        }
+
+        animationFrame = requestAnimationFrame(animate)
+
+        return () => cancelAnimationFrame(animationFrame)
+    }, [end, duration])
+
+    return count
 }
 
 function StepCard({ number, title, desc }: { number: string, title: string, desc: string }) {
@@ -198,6 +263,34 @@ function StepCard({ number, title, desc }: { number: string, title: string, desc
             <div className="mb-4 text-5xl font-bold text-white/5">{number}</div>
             <h3 className="mb-3 text-2xl font-bold text-white">{title}</h3>
             <p className="text-gray-400 leading-relaxed">{desc}</p>
+        </div>
+    )
+}
+
+function PricingCard({ title, price, period, features, isPopular }: { title: string, price: string, period?: string, features: string[], isPopular?: boolean }) {
+    return (
+        <div className={`relative rounded-2xl border p-8 backdrop-blur-sm transition-all hover:scale-105 ${isPopular ? 'border-primary bg-primary/5 shadow-[0_0_30px_rgba(var(--primary),0.2)]' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
+            {isPopular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-sm font-bold text-primary-foreground shadow-lg">
+                    Most Popular
+                </div>
+            )}
+            <h3 className="mb-2 text-xl font-medium text-gray-400">{title}</h3>
+            <div className="mb-6 flex items-baseline">
+                <span className="text-4xl font-bold text-white">{price}</span>
+                {period && <span className="ml-1 text-gray-500">{period}</span>}
+            </div>
+            <ul className="mb-8 space-y-4">
+                {features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-gray-300">
+                        <Check className="h-5 w-5 shrink-0 text-primary" />
+                        <span>{feature}</span>
+                    </li>
+                ))}
+            </ul>
+            <Button className={`w-full ${isPopular ? 'bg-primary hover:bg-primary/90' : 'bg-white/10 hover:bg-white/20'}`}>
+                Get Started
+            </Button>
         </div>
     )
 }

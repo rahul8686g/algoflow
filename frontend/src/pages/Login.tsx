@@ -186,11 +186,11 @@ export function Login() {
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <Workflow className="h-7 w-7 text-primary" />
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.5)]">
+              <div className="h-5 w-5 bg-black rounded transform rotate-45"></div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">AlgoFlow</h1>
+              <h1 className="text-2xl font-bold tracking-tighter">ALGO <span className="text-primary">FLOW</span></h1>
               <p className="text-muted-foreground text-sm">Visual Trading Automation</p>
             </div>
           </div>
@@ -236,11 +236,11 @@ export function Login() {
         <Card className="w-full max-w-md border-0 shadow-none lg:border lg:shadow-sm">
           <CardHeader className="text-center pb-2">
             {/* Mobile logo */}
-            <div className="lg:hidden flex items-center justify-center gap-2 mb-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Workflow className="h-6 w-6 text-primary" />
+            <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
+              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-[0_0_15px_rgba(var(--primary),0.5)]">
+                <div className="h-5 w-5 bg-black rounded-sm transform rotate-45"></div>
               </div>
-              <span className="text-xl font-bold">AlgoFlow</span>
+              <span className="text-xl font-bold tracking-tighter">ALGO <span className="text-primary">FLOW</span></span>
             </div>
 
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
