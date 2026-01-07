@@ -102,8 +102,8 @@ export function LandingPage() {
             </main>
 
 
-            <div className="relative z-10 w-full border-y border-white/5 bg-white/5 backdrop-blur-sm">
-                <div className="container mx-auto grid grid-cols-2 gap-8 py-12 text-center md:grid-cols-4">
+            <div className="relative z-10 container mx-auto px-4 mt-20">
+                <div className="grid grid-cols-2 gap-8 rounded-2xl border border-white/10 bg-white/5 p-10 backdrop-blur-md md:grid-cols-4 text-center shadow-[0_0_50px_-12px_rgba(var(--primary),0.2)]">
                     <MetricItem value="1B+" label="Volume Processed" />
                     <MetricItem value="50ms" label="Avg Latency" />
                     <MetricItem value="99.9%" label="Uptime" />
