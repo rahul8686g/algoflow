@@ -101,6 +101,58 @@ export function LandingPage() {
                 </div>
             </main>
 
+
+            <div className="relative z-10 w-full border-y border-white/5 bg-white/5 backdrop-blur-sm">
+                <div className="container mx-auto grid grid-cols-2 gap-8 py-12 text-center md:grid-cols-4">
+                    <MetricItem value="1B+" label="Volume Processed" />
+                    <MetricItem value="50ms" label="Avg Latency" />
+                    <MetricItem value="99.9%" label="Uptime" />
+                    <MetricItem value="10k+" label="Algo Executions" />
+                </div>
+            </div>
+
+            <section className="relative z-10 container mx-auto px-4 py-24">
+                <h2 className="mb-16 text-center text-3xl font-bold md:text-5xl">
+                    How <span className="text-primary">AlgoFlow</span> Works
+                </h2>
+                <div className="grid gap-12 md:grid-cols-3">
+                    <StepCard
+                        number="01"
+                        title="Connect"
+                        desc="Securely link your broker account. We support major API-enabled brokers with bank-grade encryption."
+                    />
+                    <StepCard
+                        number="02"
+                        title="Design"
+                        desc="Use our intuitive drag-and-drop editor to build your strategy. Combine technical indicators, price action, and logic."
+                    />
+                    <StepCard
+                        number="03"
+                        title="Deploy"
+                        desc="Activate your workflow. Run it locally for maximum privacy or deploy to the cloud for 24/7 uptime."
+                    />
+                </div>
+            </section>
+
+            <section className="relative z-10 mb-20 container mx-auto px-4">
+                <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-900/20 to-primary/20 p-12 text-center md:p-24">
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                    <div className="relative z-10">
+                        <h2 className="mb-6 text-3xl font-bold md:text-5xl">Ready to Automate Your Edge?</h2>
+                        <p className="mx-auto mb-8 max-w-2xl text-lg text-gray-300">
+                            Join the community of algorithmic traders who are taking back control of their execution.
+                        </p>
+                        <Button
+                            size="lg"
+                            className="h-14 bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 rounded-full shadow-[0_0_40px_rgba(var(--primary),0.6)] hover:shadow-[0_0_60px_rgba(var(--primary),0.8)] transition-all"
+                            onClick={() => navigate('/login')}
+                        >
+                            Get Started Now
+                        </Button>
+                    </div>
+                </div>
+            </section>
+
             {/* Footer */}
             <footer className="relative z-10 mt-20 border-t border-white/5 bg-black/50 py-12 backdrop-blur-lg">
                 <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-6 md:flex-row">
@@ -127,6 +179,25 @@ function FeatureCard({ icon: Icon, title, desc, delay }: { icon: any, title: str
             </div>
             <h3 className="mb-2 text-xl font-bold text-white">{title}</h3>
             <p className="text-gray-400 group-hover:text-gray-300 transition-colors">{desc}</p>
+        </div>
+    )
+}
+
+function MetricItem({ value, label }: { value: string, label: string }) {
+    return (
+        <div>
+            <div className="text-3xl font-bold text-white md:text-4xl">{value}</div>
+            <div className="mt-1 text-sm text-gray-400 uppercase tracking-wider">{label}</div>
+        </div>
+    )
+}
+
+function StepCard({ number, title, desc }: { number: string, title: string, desc: string }) {
+    return (
+        <div className="relative border-l border-white/10 pl-8 transition-colors hover:border-primary">
+            <div className="mb-4 text-5xl font-bold text-white/5">{number}</div>
+            <h3 className="mb-3 text-2xl font-bold text-white">{title}</h3>
+            <p className="text-gray-400 leading-relaxed">{desc}</p>
         </div>
     )
 }
