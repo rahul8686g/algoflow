@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
+import { ThemeCustomizer } from '@/components/ThemeCustomizer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +23,7 @@ export function Header() {
   const { username, logout } = useAuthStore()
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/settings', label: 'Settings', icon: Settings },
   ]
 
@@ -39,7 +40,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
               <Workflow className="h-5 w-5 text-primary" />
             </div>
@@ -81,6 +82,8 @@ export function Header() {
               {is_configured ? 'Connected' : 'Not configured'}
             </span>
           </div>
+
+          <ThemeCustomizer />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

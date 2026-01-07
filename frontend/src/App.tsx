@@ -13,6 +13,8 @@ import { Login } from '@/pages/Login'
 import { Profile } from '@/pages/Profile'
 import { KeyboardShortcuts } from '@/pages/KeyboardShortcuts'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { LandingPage } from '@/pages/LandingPage'
 import { Loader2 } from 'lucide-react'
 
 function EditorWrapper() {
@@ -81,29 +83,32 @@ export default function App() {
   }, [data, isLoading, setSettings, setLoading])
 
   return (
-    <TooltipProvider>
-      <Routes>
-        {/* Public route - Login */}
-        <Route path="/login" element={<Login />} />
+    <ThemeProvider>
+      <TooltipProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Protected routes */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/shortcuts" element={<KeyboardShortcuts />} />
-          <Route path="/editor/:id" element={<EditorWrapper />} />
-        </Route>
+          {/* Protected routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/shortcuts" element={<KeyboardShortcuts />} />
+            <Route path="/editor/:id" element={<EditorWrapper />} />
+          </Route>
 
-        {/* Catch all - redirect to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </TooltipProvider>
+          {/* Catch all - redirect to dashboard if auth, else landing */}
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />} />
+        </Routes>
+      </TooltipProvider>
+    </ThemeProvider>
   )
 }
